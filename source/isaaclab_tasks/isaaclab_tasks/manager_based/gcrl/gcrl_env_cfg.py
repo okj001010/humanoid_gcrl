@@ -70,8 +70,8 @@ class CommandsCfg:
         resampling_time_range=(10.0, 10.0),
         debug_vis=True,
         ranges=mdp.RootXYPosCommandCfg.Ranges(
-            root_x=(-5.0, 5.0),
-            root_y=(-5.0, 5.0),
+            root_x=(-1.0, 1.0),
+            root_y=(-1.0, 1.0),
         )
     )
     

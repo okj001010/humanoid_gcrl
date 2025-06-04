@@ -52,4 +52,4 @@ class RootXYPosCommandCfg(CommandTermCfg):
 
     # Set the scale of the visualization markers to (0.5, 0.5, 0.5)
     goal_root_pos_visualizer_cfg.markers["sphere"].scale = (0.5, 0.5, 0.5)
-    current_root_pos_visualizer_cfg.markers["arrow"].scale = (0.5, 0.5, 0.5)
+    current_root_pos_visualizer_cfg.markers["arrow"].scale = (0.25, 0.25, 0.25)
