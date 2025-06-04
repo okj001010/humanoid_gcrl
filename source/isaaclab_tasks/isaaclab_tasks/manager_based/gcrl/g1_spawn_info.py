@@ -1,15 +1,15 @@
-from omni.isaac.lab.assets import (
-    ArticulationCfg,
-    AssetBaseCfg,
-    Articulation,
-    RigidObject,
-)
-import omni.isaac.lab.sim as sim_utils
-from omni.isaac.lab.actuators import ImplicitActuatorCfg
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+import isaaclab.sim as sim_utils
+from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.assets import ArticulationCfg
 
 G1_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"source/isaaclab_assets/data/g1_29/g1_hand.usd",
+        usd_path=f"source/isaaclab_assets/data/g1_29_non_convex/g1_hand.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,

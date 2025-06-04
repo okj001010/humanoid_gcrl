@@ -17,6 +17,7 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
+from isaaclab.sensors import ContactSensorCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
@@ -44,9 +45,9 @@ class MySceneCfg(InteractiveSceneCfg):
     )
 
     # robot
-    robot = ArticulationCfg = MISSING
+    robot: ArticulationCfg = MISSING
     
-    # sensors
+    # contact sensors
     contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True)
 
     # lights
@@ -134,14 +135,14 @@ class RewardsCfg:
     # TODO: Add goal reaching reward
     
     # (1) Sparse reward for reaching the goal
-    goal_reached = RewTerm(
-        #
-    )
+    # goal_reached = RewTerm(
+    #     #
+    # )
     
     # (2) Dense reward for reaching the goal (spatial distance)
-    spatial_distance = RewTerm(
-        #
-    )
+    # spatial_distance = RewTerm(
+    #     #
+    # )
     
 
 
@@ -160,9 +161,9 @@ class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
     # TODO: Add spatial distance based curriculum
-    spatial_distance_curriculum = CurrTerm(
-        # TODO
-    )
+    # spatial_distance_curriculum = CurrTerm(
+    #     #
+    # )
 
 
 ##
@@ -197,7 +198,25 @@ class G1GCRLEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.physics_material = self.scene.terrain.physics_material
         self.sim.physx.gpu_max_rigid_patch_count = 10 * 2**15
         
+        # update sensor update periods
+        # we tick all the sensors based on the smallest update period (physics update period)
+        if self.scene.contact_forces is not None:
+            self.scene.contact_forces.update_period = self.sim.dt
+        
         # Scene
         self.scene.robot = G1_CFG.replace(
             prim_path="{ENV_REGEX_NS}/Robot",
         )
+
+
+@configclass
+class G1GCRLEnvCfgPlay(G1GCRLEnvCfg):
+    def __post_init__(self) -> None:
+        # post init of parent
+        super().__post_init__()
+
+        # make a smaller scene for play
+        self.scene.num_envs = 50
+        self.scene.env_spacing = 2.5
+        # disable randomization for play
+        self.observations.policy.enable_corruption = False
