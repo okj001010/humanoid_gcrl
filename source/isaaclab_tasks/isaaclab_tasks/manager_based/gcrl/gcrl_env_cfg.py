@@ -6,7 +6,6 @@
 from dataclasses import MISSING
 
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
@@ -22,7 +21,7 @@ from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
-import isaaclab_tasks.manager_based.classic.humanoid.mdp as mdp
+import isaaclab_tasks.manager_based.gcrl.mdp as mdp
 
 from .g1_spawn_info import G1_CFG
 
@@ -66,9 +65,16 @@ class MySceneCfg(InteractiveSceneCfg):
 class CommandsCfg:
     """Command specifications for the MDP."""
 
-    # TODO: Add x, y, yaw goal
-    pass
-
+    root_xy_pos = mdp.RootXYPosCommandCfg(
+        asset_name="robot",
+        debug_vis=True,
+        ranges=mdp.RootXYPosCommandCfg.Ranges(
+            x=(-5.0, 5.0),
+            y=(-5.0, 5.0),
+        )
+    )
+    
+    # TODO: Add x, y, yaw goal + joint position, etc ...
 
 
 @configclass
@@ -93,6 +99,7 @@ class ObservationsCfg:
             func=mdp.projected_gravity,
             noise=Unoise(n_min=-0.05, n_max=0.05),
         )
+        goal_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "root_xy_pos"})
         joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01))
         joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5))
         actions = ObsTerm(func=mdp.last_action)
@@ -131,6 +138,17 @@ class EventCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
+    
+    # default reward term
+    alive = RewTerm(
+        func=mdp.is_alive,
+        weight=1.0,
+    )
+    termination_penalty = RewTerm(
+        func=mdp.is_terminated_term,
+        params={"term_keys": ["pelvis_height_below_minimum", "pelvis_bad_ori"]},
+        weight=-50.0,
+    )
 
     # TODO: Add goal reaching reward
     
@@ -153,7 +171,9 @@ class TerminationsCfg:
     # (1) Terminate if the episode length is exceeded
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
     # (2) Terminate if the robot falls
-    torso_height = DoneTerm(func=mdp.root_height_below_minimum, params={"minimum_height": 0.8})
+    pelvis_height_below_minimum = DoneTerm(func=mdp.root_height_below_minimum, params={"minimum_height": 0.3})
+    # (3) Terminate if the pelvis orientation is bad
+    pelvis_bad_ori = DoneTerm(func=mdp.pelvis_bad_ori, params={"limit_euler_angle": [0.9, 1.0]})
 
 
 @configclass
@@ -185,7 +205,7 @@ class G1GCRLEnvCfg(ManagerBasedRLEnvCfg):
     rewards: RewardsCfg = RewardsCfg()
     terminations: TerminationsCfg = TerminationsCfg()
     events: EventCfg = EventCfg()
-    curriculum: CurriculumCfg = CurriculumCfg()
+    # curriculum: CurriculumCfg = CurriculumCfg()   # TODO: Add spatial distance based curriculum
 
     def __post_init__(self):
         """Post initialization."""
