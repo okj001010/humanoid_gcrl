@@ -123,7 +123,7 @@ class RootXYPosCommand(CommandTerm):
         # -- goal root xy pos
         vis_goal_root_pos_w = torch.zeros_like(self.robot.data.root_pos_w)
         vis_goal_root_pos_w[:, :2] = self.goal_command_w[:, :2]
-        self.goal_root_pos_visualizer.visualize(self.vis_goal_root_pos_w)
+        self.goal_root_pos_visualizer.visualize(vis_goal_root_pos_w)
         # -- current root xy pos
         vis_current_root_pos_w = torch.zeros_like(self.robot.data.root_pos_w)
         vis_current_root_pos_w[:, :2] = self.robot.data.root_pos_w[:, :2]

@@ -67,10 +67,11 @@ class CommandsCfg:
 
     root_xy_pos = mdp.RootXYPosCommandCfg(
         asset_name="robot",
+        resampling_time_range=(10.0, 10.0),
         debug_vis=True,
         ranges=mdp.RootXYPosCommandCfg.Ranges(
-            x=(-5.0, 5.0),
-            y=(-5.0, 5.0),
+            root_x=(-5.0, 5.0),
+            root_y=(-5.0, 5.0),
         )
     )
     

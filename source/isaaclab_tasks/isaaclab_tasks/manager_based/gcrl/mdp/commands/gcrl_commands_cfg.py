@@ -51,5 +51,5 @@ class RootXYPosCommandCfg(CommandTermCfg):
     """The configuration for the current root position visualization marker. Defaults to GREEN_ARROW_X_MARKER_CFG."""
 
     # Set the scale of the visualization markers to (0.5, 0.5, 0.5)
-    goal_root_pos_visualizer_cfg.markers["arrow"].scale = (0.5, 0.5, 0.5)
+    goal_root_pos_visualizer_cfg.markers["sphere"].scale = (0.5, 0.5, 0.5)
     current_root_pos_visualizer_cfg.markers["arrow"].scale = (0.5, 0.5, 0.5)
