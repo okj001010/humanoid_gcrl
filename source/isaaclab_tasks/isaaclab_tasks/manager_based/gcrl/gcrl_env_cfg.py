@@ -147,21 +147,27 @@ class RewardsCfg:
     )
     termination_penalty = RewTerm(
         func=mdp.is_terminated_term,
-        params={"term_keys": ["pelvis_height_below_minimum", "pelvis_bad_ori"]},
         weight=-50.0,
+        params={"term_keys": ["pelvis_height_below_minimum", "pelvis_bad_ori"]},
     )
-
-    # TODO: Add goal reaching reward
     
-    # (1) Sparse reward for reaching the goal
-    # goal_reached = RewTerm(
-    #     #
-    # )
+    # (1) Sparse reward for reaching the goal with energy efficient
+    goal_reached_with_low_energy = RewTerm(
+        func=mdp.goal_reached_with_low_energy,
+        weight=1.0, # TODO: Need to tune this weight
+        params={
+            "command_name": "root_xy_pos",
+            "threshold": 0.1,       # threshold for goal reaching
+            "energy_scale": 0.01,   # scale for energy consumption: exp(-energy_consumption * energy_scale)
+        }
+    )
     
-    # (2) Dense reward for reaching the goal (spatial distance)
-    # spatial_distance = RewTerm(
-    #     #
-    # )
+    # (2) Dense reward for reaching the goal based on spatial distance
+    progress_to_target = RewTerm(
+        func=mdp.progress_to_target,
+        weight=1.0, # TODO: Need to tune this weight
+        params={"command_name": "root_xy_pos"}
+    )
     
 
 
